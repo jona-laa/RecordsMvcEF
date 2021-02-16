@@ -8,7 +8,7 @@ namespace RecordsMvcEf.Models
     {
         public int AlbumId { get; set; }
         
-        [Display(Name = "Album Name"), Required(ErrorMessage = "Field is required")]
+        [Display(Name = "Album"), Required(ErrorMessage = "Field is required")]
         public string AlbumName { get; set; }
 
         [Display(Name = "Release Date"), Required(ErrorMessage = "Field is required")]

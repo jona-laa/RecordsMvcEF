@@ -7,9 +7,7 @@ namespace RecordsMvcEf.Models
     {
         public int ArtistId { get; set; }
         
-        [Display(Name = "Artist Name"), Required(ErrorMessage = "Field is required")]
+        [Display(Name = "Artist"), Required(ErrorMessage = "Field is required")]
         public string ArtistName { get; set; }
-
-        public List<Album> Albums { get; } = new List<Album>();
     }
 }

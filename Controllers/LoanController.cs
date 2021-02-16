@@ -10,29 +10,29 @@ using RecordsMvcEf.Models;
 
 namespace RecordsMvcEf.Controllers
 {
-    public class AlbumController : Controller
+    public class LoanController : Controller
     {
         private readonly AlbumContext _context;
 
-        public AlbumController(AlbumContext context)
+        public LoanController(AlbumContext context)
         {
             _context = context;
         }
 
-        // GET: Album
+        // GET: Loan
         public async Task<IActionResult> Index(string searchString)
         {
-            var albums = _context.Albums.Include(a => a.Artist);
+            var loans = _context.Loans.Include(a => a.Album);
             
             if (!String.IsNullOrEmpty(searchString))
             {
-                albums = _context.Albums.Where(a => a.AlbumName.ToLower().Contains(searchString.ToLower())).Include(a => a.Artist);
+                loans = _context.Loans.Where(a => a.Album.AlbumName.ToLower().Contains(searchString.ToLower())).Include(a => a.Album);
             }
 
-            return View(await albums.ToListAsync());
+            return View(await loans.ToListAsync());
         }
 
-        // GET: Album/Details/5
+        // GET: Loan/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -40,40 +40,40 @@ namespace RecordsMvcEf.Controllers
                 return NotFound();
             }
 
-            var album = await _context.Albums
-                .Include(a => a.Artist)
-                .FirstOrDefaultAsync(m => m.AlbumId == id);
-            if (album == null)
+            var loan = await _context.Loans
+                .Include(l => l.Album)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (loan == null)
             {
                 return NotFound();
             }
 
-            return View(album);
+            return View(loan);
         }
 
-        // GET: Album/Create
+        // GET: Loan/Create
         public IActionResult Create()
         {
-            ViewData["ArtistId"] = new SelectList(_context.Artists, "ArtistId", "ArtistName");
+            ViewData["AlbumId"] = new SelectList(_context.Albums, "AlbumId", "AlbumName");
             return View();
         }
 
-        // POST: Album/Create
+        // POST: Loan/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AlbumId,AlbumName,ReleaseDate,ArtistId")] Album album)
+        public async Task<IActionResult> Create([Bind("Id,LentTo,LoanDate,IsReturned,AlbumId")] Loan loan)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(album);
+                _context.Add(loan);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ArtistId"] = new SelectList(_context.Artists, "ArtistId", "ArtistName", album.ArtistId);
-            return View(album);
+            ViewData["AlbumId"] = new SelectList(_context.Albums, "AlbumId", "AlbumName", loan.AlbumId);
+            return View(loan);
         }
 
-        // GET: Album/Edit/5
+        // GET: Loan/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,21 +81,21 @@ namespace RecordsMvcEf.Controllers
                 return NotFound();
             }
 
-            var album = await _context.Albums.FindAsync(id);
-            if (album == null)
+            var loan = await _context.Loans.FindAsync(id);
+            if (loan == null)
             {
                 return NotFound();
             }
-            ViewData["ArtistId"] = new SelectList(_context.Artists, "ArtistId", "ArtistName", album.ArtistId);
-            return View(album);
+            ViewData["AlbumId"] = new SelectList(_context.Albums, "AlbumId", "AlbumName", loan.AlbumId);
+            return View(loan);
         }
 
-        // POST: Album/Edit/5
+        // POST: Loan/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AlbumId,AlbumName,ReleaseDate,ArtistId")] Album album)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,LentTo,LoanDate,IsReturned,AlbumId")] Loan loan)
         {
-            if (id != album.AlbumId)
+            if (id != loan.Id)
             {
                 return NotFound();
             }
@@ -104,12 +104,12 @@ namespace RecordsMvcEf.Controllers
             {
                 try
                 {
-                    _context.Update(album);
+                    _context.Update(loan);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AlbumExists(album.AlbumId))
+                    if (!LoanExists(loan.Id))
                     {
                         return NotFound();
                     }
@@ -120,11 +120,11 @@ namespace RecordsMvcEf.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ArtistId"] = new SelectList(_context.Artists, "ArtistId", "ArtistName", album.ArtistId);
-            return View(album);
+            ViewData["AlbumId"] = new SelectList(_context.Albums, "AlbumId", "AlbumName", loan.AlbumId);
+            return View(loan);
         }
 
-        // GET: Album/Delete/5
+        // GET: Loan/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -132,31 +132,31 @@ namespace RecordsMvcEf.Controllers
                 return NotFound();
             }
 
-            var album = await _context.Albums
-                .Include(a => a.Artist)
-                .FirstOrDefaultAsync(m => m.AlbumId == id);
-            if (album == null)
+            var loan = await _context.Loans
+                .Include(l => l.Album)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (loan == null)
             {
                 return NotFound();
             }
 
-            return View(album);
+            return View(loan);
         }
 
-        // POST: Album/Delete/5
+        // POST: Loan/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var album = await _context.Albums.FindAsync(id);
-            _context.Albums.Remove(album);
+            var loan = await _context.Loans.FindAsync(id);
+            _context.Loans.Remove(loan);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AlbumExists(int id)
+        private bool LoanExists(int id)
         {
-            return _context.Albums.Any(e => e.AlbumId == id);
+            return _context.Loans.Any(e => e.Id == id);
         }
     }
 }
